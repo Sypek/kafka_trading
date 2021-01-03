@@ -1,4 +1,5 @@
 from forex_python.bitcoin import BtcConverter
+import datetime
 
 class PriceGetter:
     def __init__(self, currencies_list):
@@ -7,6 +8,8 @@ class PriceGetter:
 
     def get_price(self):
         result = dict()
+        result['datetime'] = str(datetime.datetime.now())
         for curr in self.currencies:
             result[curr] = self.bitcoin.get_latest_price(curr)
+        
         return result
