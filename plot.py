@@ -1,6 +1,6 @@
 import io
 from base64 import b64encode
-
+import copy
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -11,11 +11,35 @@ from kafka import KafkaConsumer
 from json import loads
 
 
+# consumer = KafkaConsumer(
+#     'test1',
+#     bootstrap_servers=['localhost:9092'],
+#     auto_offset_reset='earliest',
+#     enable_auto_commit=True,
+#     auto_commit_interval_ms=1000,
+#     group_id='counters',
+#     value_deserializer=lambda x: loads(x.decode('utf-8')))
+
+class Konsument():
+    def __init__(self):
+        self.consumer = KafkaConsumer(
+                        'btc001',
+                        bootstrap_servers=['localhost:9092'],
+                        auto_offset_reset='earliest',
+                        enable_auto_commit=False,
+                        # auto_commit_interval_ms=100 * 1000,
+                        group_id='counters',
+                        value_deserializer=lambda x: loads(x.decode('utf-8')))
 
 
-# for message in consumer:
-#     print(message)
-#     print(message.value)
+    def get_messages(self):
+
+        msg = next(self.consumer)
+        msg = msg.value
+        print(msg, flush=True)
+        return msg
+
+k = Konsument()
 
 
 buffer = io.StringIO()
@@ -47,21 +71,8 @@ app.layout = html.Div([
               Input('interval-component', 'n_intervals'))
 def update_metrics(n):
 
-    consumer = KafkaConsumer(
-        'test1',
-        bootstrap_servers=['localhost:9092'],
-        auto_offset_reset='earliest',
-        enable_auto_commit=True,
-        auto_commit_interval_ms=1000,
-        group_id='counters',
-        value_deserializer=lambda x: loads(x.decode('utf-8')))
-
-    result = 'INPUT'
-
-    for message in consumer:
-        result = result + str(message.value)
-    print(result)
-    return html.Div(n)
+    result = str(k.get_messages())
+    return html.Div(result)
 
 if __name__ == "__main__":           
     app.run_server(debug=True)

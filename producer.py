@@ -11,6 +11,6 @@ price_getter = PriceGetter(['USD', 'PLN'])
 
 while True:
     current_price = price_getter.get_price()
-    producer.send('test1', value=current_price)
+    producer.send('btc001', value=current_price)
     print(current_price)
-    sleep(30)
+    sleep(20)
